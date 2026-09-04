@@ -1,357 +1,430 @@
 # PayShield AI
 
-## AI-Powered Payment Risk Monitoring and Success Optimization System
+### Machine-Learning-Based Payment Risk Prediction and AI-Assisted Revenue Recovery
 
-PayShield AI is a machine-learning-based payment intelligence system designed to predict payment failure risk, identify payment-system anomalies, and recommend appropriate optimization actions.
+PayShield AI is an intelligent payment monitoring and decision-support system designed to identify payment failure risk before authorization and recommend actions that can improve payment success.
 
-The system combines payment transaction analytics, machine learning, risk scoring, operational diagnostics, pre-payment risk assessment, and AI-assisted optimization recommendations in an interactive Streamlit dashboard.
+The system combines machine-learning-based risk prediction with payment-system health signals from sender banks, receiver banks, and payment gateways. It diagnoses the likely source of payment degradation and produces an AI-assisted recovery recommendation such as monitoring, retrying through an alternate route, or routing traffic away from an unhealthy payment environment.
 
----
-
-## 1. Problem Statement
-
-Payment failures can occur because of:
-
-- High bank failure rates
-- Gateway timeout spikes
-- Increased payment latency
-- Downstream bank outages
-- Abnormal transaction behavior
-
-Traditional monitoring systems primarily report these problems after they occur.
-
-PayShield AI uses machine learning to estimate payment failure risk and converts those predictions into actionable optimization recommendations.
+> **Current implementation:** PayShield AI is a local simulation and decision-intelligence prototype. It does not connect to live UPI networks, bank accounts, payment gateways, or real payment authorization systems.
 
 ---
 
-## 2. Project Objectives
+## Problem
 
-The main objectives of PayShield AI are:
+Payment failures can result from several interacting conditions:
 
-1. Monitor payment-system health.
-2. Detect potentially risky payment conditions.
-3. Predict payment failure risk using machine learning.
-4. Classify predictions into standardized risk tiers.
-5. Identify operational risk drivers.
-6. Generate AI-assisted payment optimization recommendations.
-7. Provide an interactive monitoring dashboard.
-8. Support targeted intervention instead of broad traffic disruption.
+* Sender-bank degradation
+* Receiver-bank degradation
+* Payment gateway degradation
+* Increased latency
+* Payment timeouts
+* Elevated transaction failure rates
+* Sudden changes in payment-system behaviour
 
----
+A payment failure is not always caused by the same component. Simply retrying a failed payment may therefore be ineffective when the underlying payment route is experiencing degradation.
 
-## 3. AI / Machine Learning Component
+PayShield AI addresses this problem through a four-stage intelligence workflow:
 
-The core AI model is a Random Forest Classifier.
-
-### Model Configuration
-
-- Algorithm: Random Forest Classifier
-- Number of estimators: 200
-- Class weighting: Balanced
-- Random state: 42
-- Parallel processing: Enabled
-
-The model uses 21 operational and behavioral features.
-
-### ML Features
-
-- transaction_count
-- failure_rate
-- timeout_rate
-- avg_latency
-- max_latency
-- p95_latency
-- bank_error_rate
-- avg_amount
-- max_amount
-- hour
-- day_of_week
-- is_weekend
-- previous_failure_rate
-- previous_latency
-- previous_timeout_rate
-- failure_rate_change
-- latency_change
-- timeout_rate_change
-- rolling_failure_rate
-- rolling_latency
-- rolling_timeout_rate
-
----
-
-## 4. AI Prediction Pipeline
-
-PayShield AI supports risk prediction from payment transaction and payment-system telemetry.
-
-The general prediction pipeline is:
 ```text
-
-Payment / Monitoring Data
-        |
-        v
-Feature Engineering
-        |
-        v
-21 ML Features
-        |
-        v
-Random Forest Classifier
-        |
-        v
-Risk Probability
-        |
-        v
-Risk Tier
-        |
-        v
-Optimization Recommendation
-        |
-        v
-Dashboard
+DETECT
+   ↓
+DIAGNOSE
+   ↓
+DECIDE
+   ↓
+RECOVER
 ```
 
-The model produces a probability representing the estimated likelihood of payment failure for the supplied transaction or payment-system context.
+The system first detects abnormal payment behaviour, identifies the most likely source of degradation, estimates payment risk, and then recommends an appropriate recovery action.
 
 ---
 
-## 5. Risk Classification
+## Solution
 
-PayShield AI uses four risk tiers:
+### PayShield AI provides:
 
-| Risk Tier | Probability |
-|-----------|-------------|
-| LOW | < 20% |
-| ELEVATED | 20% - < 50% |
-| MEDIUM | 50% - < 80% |
-| HIGH | >= 80% |
+### 1. Payment Risk Prediction
 
-For binary risk identification, a probability of 50% or higher is treated as risky.
+* Predicts the probability of payment failure.
+* Uses transaction behaviour, latency, timeout, and historical payment signals.
+
+### 2. Bank Health Monitoring
+
+* Monitors simulated sender-bank and receiver-bank conditions.
+* Identifies normal, degraded, severe, and recovery states.
+
+### 3. Gateway Health Monitoring
+
+* Models simulated payment-gateway degradation and latency/timeout surges.
+
+### 4. Root-Cause Diagnosis
+
+* Distinguishes between sender-bank, receiver-bank, and gateway-related degradation.
+
+### 5. Pre-Payment Risk Assessment
+
+* Allows a payment scenario to be evaluated before authorization.
+* Provides a simulated risk probability and risk tier.
+
+### 6. AI-Assisted Recovery Recommendations
+
+Recommends actions such as:
+
+* No intervention
+* Monitor closely
+* Reduce traffic exposure
+* Prefer an alternate healthy route
+* Route traffic away from an unhealthy route
+
+### 7. Interactive Monitoring Dashboard
+
+Displays:
+
+* Payment success rate
+* Average latency
+* Transaction volume
+* High-risk predictions
+* Bank health
+* Gateway/system health
+* Risk distribution
+* Optimization priorities
+* Diagnostic recommendations
 
 ---
 
-## 6. Model Evaluation
+## Architecture
 
-The model was evaluated using a separate 20% holdout test set.
+```text
+                    Payment Attempt
+                          │
+                          ▼
+              Collect Payment Signals
+                          │
+          ┌───────────────┼───────────────┐
+          ▼               ▼               ▼
+     Sender Bank     Receiver Bank    Gateway Health
+        Health           Health
+          │               │               │
+          └───────────────┼───────────────┘
+                          ▼
+                 Root-Cause Diagnosis
+                          │
+                          ▼
+                  ML Risk Prediction
+                          │
+                          ▼
+                  Risk Classification
+                          │
+                          ▼
+                   Recovery Decision
+                          │
+          ┌───────────────┼───────────────┐
+          ▼               ▼               ▼
+        Retry       Alternate Route     Monitor
+                          │
+                          ▼
+                    Measure / Improve
+```
 
-### Evaluation Results
+---
 
-- Accuracy: 99.82%
-- Precision: 91.30%
-- Recall: 75.00%
-- F1 Score: 82.35%
-- ROC-AUC: 93.98%
+## Key Workflow
+
+### 1. Detect
+
+The system monitors payment behaviour and identifies abnormal conditions using:
+
+* Failure rate
+* Timeout rate
+* Transaction latency
+* Error behaviour
+* Historical failure patterns
+* Rolling payment metrics
+* Recent changes in payment behaviour
+
+### 2. Diagnose
+
+PayShield AI evaluates simulated payment-system health to determine the most likely source of degradation.
+
+**Possible primary causes include:**
+
+```text
+NORMAL
+GATEWAY_DEGRADED
+SENDER_BANK_DEGRADED
+RECEIVER_BANK_DEGRADED
+```
+
+The system prioritizes gateway, sender-bank, and receiver-bank conditions when multiple degradation signals are present.
+
+### 3. Decide
+
+The machine-learning model produces a payment-risk probability.
+
+Risk levels are classified as:
+
+| Risk Probability | Risk Level |
+| ---------------: | ---------- |
+|            < 20% | LOW        |
+|      20% – < 50% | ELEVATED   |
+|      50% – < 80% | MEDIUM     |
+|            ≥ 80% | HIGH       |
+
+The current decision threshold for binary risky/non-risky classification is **50%**.
+
+### 4. Recover
+
+Based on risk, latency, timeout, failure behaviour, and payment-system health, the optimization layer recommends an appropriate intervention.
+
+**Examples:**
+
+| Situation                         | Recommended Action                |
+| --------------------------------- | --------------------------------- |
+| Low payment risk                  | No intervention required          |
+| Elevated risk + high latency      | Reduce traffic exposure           |
+| Medium risk                       | Monitor closely                   |
+| High risk + latency/timeout surge | Prefer an alternate healthy route |
+| High risk + severe degradation    | Route traffic away                |
+
+The current optimization engine is an **AI-assisted recommendation layer** rather than a fully autonomous routing policy.
+
+---
+
+## Machine Learning Model
+
+PayShield AI currently uses a **Random Forest Classifier** for payment-failure risk prediction.
+
+### Configuration
+
+```python
+RandomForestClassifier(
+    n_estimators=200,
+    class_weight="balanced",
+    random_state=42,
+    n_jobs=-1
+)
+```
+
+The model uses behavioural and rolling payment features including:
+
+* Transaction count
+* Failure rate
+* Timeout rate
+* Average latency
+* Maximum latency
+* P95 latency
+* Bank error rate
+* Average transaction amount
+* Maximum transaction amount
+* Hour
+* Day of week
+* Weekend indicator
+* Previous failure rate
+* Previous latency
+* Previous timeout rate
+* Failure-rate change
+* Latency-change rate
+* Timeout-rate change
+* Rolling failure rate
+* Rolling latency
+* Rolling timeout rate
+
+---
+
+## Model Evaluation
+
+The current holdout evaluation produced:
+
+| Metric    | Result |
+| --------- | -----: |
+| Accuracy  | 99.82% |
+| Precision | 91.30% |
+| Recall    | 75.00% |
+| F1 Score  | 82.35% |
+| ROC-AUC   | 93.98% |
 
 ### Holdout Confusion Matrix
 
-| | Predicted Normal | Predicted Risky |
-|---|---:|---:|
-| Actual Normal | 10,129 | 4 |
-| Actual Risky | 14 | 42 |
-
-The evaluation demonstrates that the model can distinguish risky payment conditions while maintaining high precision.
-
----
-
-## 7. Threshold Analysis
-
-Multiple probability thresholds were evaluated.
-
-The selected binary risk threshold is:
-
-**50%**
-
-This threshold produced the strongest F1 score among the tested thresholds:
-
-- Precision: 91.30%
-- Recall: 75.00%
-- F1 Score: 82.35%
-
----
-
-## 8. Risk Engine
-
-The PayShield Risk Engine provides a reusable interface around the trained machine-learning model.
-
-### Main Capabilities
-
-- Feature validation
-- Model loading
-- Risk probability prediction
-- Risk-tier classification
-- Binary risky/not-risky classification
-- Model persistence
-
-### Model File
-
 ```text
-models/payshield_risk_model.joblib
+                 Predicted
+                Normal  Risky
+Actual Normal    10129      4
+Actual Risky        14     42
 ```
 
----
-
-## 9. AI Payment Success Optimization
-
-The optimization layer converts AI risk predictions into recommended operational actions.
-
-Examples include:
-
-| Detected Condition | AI-Assisted Recommendation |
-|---|---|
-| HIGH risk + high failure rate | Route traffic away |
-| HIGH risk + timeout/latency pressure | Prefer alternate healthy route |
-| MEDIUM risk | Monitor closely |
-| ELEVATED risk + high latency | Reduce traffic exposure |
-| LOW risk | No intervention required |
-
-This allows the system to move beyond monitoring and provide operational decision support.
+The model is designed to prioritize detection of risky payment behaviour while maintaining a practical balance between precision and recall.
 
 ---
 
-## 10. Optimization Priorities
+## Dataset
 
-Recommendations are assigned priorities:
+PayShield AI uses a simulated payment transaction dataset containing **100,000 transactions**.
 
-- CRITICAL
-- HIGH
-- MEDIUM
-- LOW
+The dataset includes:
 
-The current dashboard applies the optimization engine to the AI-generated risk predictions.
+```text
+transaction_id
+timestamp
+amount
+sender_bank
+receiver_bank
+payment_method
+upi_app
+bank_health
+sender_bank_health
+gateway_health
+latency_ms
+payment_status
+error_code
+timeout
+root_cause
+```
 
-The validated dashboard output across 100,000 monitored transactions includes:
+The simulated environment contains multiple Indian bank identifiers and payment-system conditions.
 
-- 12 Critical actions
-- 274 High-priority actions
-- 6 Medium-priority actions
-- 9,897 Low-priority / no-intervention cases
+### Simulated System States
 
-The 12 Critical and 274 High-priority recommendations correspond directly to the 286 HIGH-risk predictions, while the remaining recommendations are associated with ELEVATED or LOW-risk conditions.
+```text
+NORMAL
+DEGRADED
+SEVERE
+RECOVERY
+```
 
----
+The dataset includes controlled degradation scenarios for:
 
-## 11. Risk-Driver Diagnostics
+* Receiver banks
+* Sender banks
+* Payment gateways
 
-PayShield AI provides operational explanations using payment-system indicators such as:
-
-- Elevated bank failure rate
-- Gateway timeout surge
-- High latency spike
-- Model anomaly score
-
-These diagnostics help users understand which operational indicators are associated with elevated payment risk.
-
----
-
-## 12. Bank Health Monitoring
-
-The dashboard monitors receiver-bank performance using:
-
-- Bank health status
-- Failure rate
-- Timeout rate
-- Average latency
-- Historical performance trends
-
-A dual-axis trend visualization separates latency from failure and timeout percentages for clearer interpretation.
+This allows the project to demonstrate how payment risk can change when different components of a payment route experience degradation.
 
 ---
 
-## 13. Dashboard
+## Dashboard
 
-The Streamlit dashboard provides the following analytical sections.
+PayShield AI includes an interactive dashboard built with **Streamlit**.
 
-### System Health
+The dashboard provides two major capabilities.
 
-- Payment success rate
-- Average latency
-- Transactions monitored
-- High-risk prediction count
+### Payment Monitoring
 
-### Bank Monitoring
+The monitoring interface displays:
 
-- Bank selector
-- Bank health
-- Failure rate
-- Timeout rate
-- Average latency
-- Historical trend
+* Payment success rate
+* Average latency
+* Number of transactions monitored
+* High-risk predictions
+* Bank health
+* Failure rates
+* Timeout rates
+* Risk distribution
+* Optimization priorities
+* Current system status
 
-### Risk Monitoring
+### Pre-Payment Check
 
-- HIGH
-- MEDIUM
-- ELEVATED
-- LOW
+The dashboard provides an interactive payment-risk simulation.
 
-### Pre-Payment AI Risk Check
+Users can select:
 
-PayShield AI includes a pre-payment risk simulation that estimates payment failure risk before authorization using the latest available receiver-bank and payment-system conditions.
+* Sender bank
+* Receiver bank
+* Transaction amount
+* Payment-system scenario
 
-The feature is designed as a decision-support layer that can identify elevated payment risk before a payment is authorized and recommend an appropriate action.
+Available demonstration scenarios include:
 
-The simulator allows the user to:
+```text
+Healthy Payment Route
+Sender Bank Degradation
+Receiver Bank Degradation
+Payment Gateway Latency & Timeout Surge
+```
 
-- Select a receiver bank
-- Enter a transaction amount
-- Select the payment hour
-- Evaluate the current payment-system conditions
-- Run a controlled degraded-bank stress simulation
-- Receive an AI risk probability
-- Receive a risk tier
-- Receive an AI-assisted recommended action
+The system then produces:
 
-Example validated scenarios:
-
-| Scenario | AI Risk | Risk Tier | Recommendation |
-|---|---:|---|---|
-| Healthy baseline | 0.00% | LOW | No intervention required |
-| Degraded bank simulation | 84.50% | HIGH | Route traffic away |
-
-The stress mode is a controlled simulation used to demonstrate how the risk engine responds to degraded payment-system conditions. It does not represent live bank, UPI, or payment-gateway telemetry.
-
-### Diagnostics
-
-- Risk filtering
-- Probability filtering
-- Risk-driver filtering
-- Transaction-level investigation
-- Risk-driver diagnostics
-
-### AI Optimization
-
-- Critical actions
-- High-priority actions
-- Medium-priority actions
-- No-intervention cases
-- Recommended payment actions
-- AI risk
-- Optimization priority
-- AI reasoning
-
-### Risk Trend
-
-- Model risk probability trend
-- Rolling risk average
-- Operational risk monitoring
+* Final payment-risk probability
+* Risk tier
+* ML model probability
+* Primary payment-system issue
+* Sender-bank health
+* Receiver-bank health
+* Gateway health
+* Recommended action
 
 ---
 
-## 14. Technology Stack
+## Example Decision
 
-- Python
-- Pandas
-- NumPy
-- Scikit-learn
-- Joblib
-- Plotly
-- Streamlit
+For a simulated severe sender-bank degradation scenario, PayShield AI can produce a decision such as:
+
+```text
+HIGH PAYMENT RISK
+
+Risk Probability: 85.0%
+
+Primary Issue:
+Sender Bank Degradation
+
+Sender Health:
+Severe
+
+Recommended Action:
+Route traffic away
+```
+
+This demonstrates how payment-system health can influence a pre-payment decision.
+
+The dashboard also displays the underlying machine-learning probability separately from the final simulation decision.
 
 ---
 
-## 15. Project Structure
+## Optimization Engine
+
+The optimization layer converts risk and system-health information into an actionable recommendation.
+
+### Example Decision Flow
+
+```text
+Risk Probability
+       +
+Failure Behaviour
+       +
+Latency / Timeout Behaviour
+       +
+Sender Health
+       +
+Receiver Health
+       +
+Gateway Health
+       │
+       ▼
+Recovery Recommendation
+```
+
+### Current Recommendations
+
+```text
+No intervention required
+Monitor closely
+Reduce traffic exposure
+Prefer alternate healthy route
+Route traffic away
+```
+
+The current implementation does not claim that these recommendations are learned causal policies.
+
+A production-grade optimization policy would require historical intervention outcomes, counterfactual routing experiments, and controlled A/B testing.
+
+---
+
+## Project Structure
 
 ```text
 PayShield AI/
+│
 ├── app/
 │   └── dashboard.py
 │
@@ -386,11 +459,11 @@ PayShield AI/
 │   ├── engine.py
 │   ├── evaluate.py
 │   ├── predict.py
+│   ├── threshold_analysis.py
+│   ├── train.py
 │   ├── test_engine.py
 │   ├── test_predict.py
-│   ├── test_real_data.py
-│   ├── threshold_analysis.py
-│   └── train.py
+│   └── test_real_data.py
 │
 ├── src/
 │   └── data_generation.py
@@ -402,162 +475,295 @@ PayShield AI/
 
 ---
 
-## 16. Running the Project
+## Running the Project
 
-From the project root:
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Abhilasha-git/PayShield-AI.git
+cd PayShield-AI
+```
+
+### 2. Create a Virtual Environment
+
+Windows:
 
 ```powershell
-streamlit run app\dashboard.py
+python -m venv venv
 ```
+
+Activate it:
+
+```powershell
+.\venv\Scripts\Activate.ps1
+```
+
+### 3. Install Dependencies
+
+```powershell
+pip install -r requirements.txt
+```
+
+### 4. Run the Dashboard
+
+```powershell
+streamlit run app/dashboard.py
+```
+
+The Streamlit application will open in the browser.
 
 ---
 
-## 17. Current AI Architecture
+## Risk Engine
+
+The trained model is stored at:
 
 ```text
-                         PAYMENT / MONITORING DATA
-                              |
-                              v
-                       FEATURE ENGINEERING
-                              |
-                              v
-                         21 ML FEATURES
-                              |
-                              v
-                  +-------------------------+
-                  | Random Forest Classifier |
-                  |        AI MODEL          |
-                  +-------------------------+
-                              |
-                              v
-                       RISK PROBABILITY
-                              |
-                              v
-                         RISK TIER
-                              |
-                    +---------+---------+
-                    |                   |
-                    v                   v
-             RISK DIAGNOSTICS    OPTIMIZATION ENGINE
-                                        |
-                                        v
-                              AI-ASSISTED RECOMMENDATION
-                                        |
-                                        v
-                              STREAMLIT DASHBOARD
+models/payshield_risk_model.joblib
+```
 
+The risk engine can be used independently of the dashboard.
 
-             PRE-PAYMENT AI RISK CHECK
-                        |
-                        v
-              Receiver Bank + Amount
-                        |
-                        v
-                Current Telemetry
-                        |
-                        v
-                  PayShield AI
-                        |
-                        v
-               Risk + Recommendation
+Example:
+
+```python
+from risk_engine.predict import predict_risk
+
+predictions = predict_risk(data)
+```
+
+The prediction pipeline adds:
+
+```text
+risk_probability
+risk_level
+is_risky
+```
+
+to the prediction dataset.
+
+---
+
+## Testing
+
+The project includes standalone validation scripts for the risk engine.
+
+Run:
+
+```powershell
+python -m risk_engine.test_engine
+```
+
+```powershell
+python -m risk_engine.test_predict
+```
+
+```powershell
+python -m risk_engine.test_real_data
+```
+
+These scripts validate:
+
+* Model loading
+* Risk prediction
+* Risk classification
+* Prediction output structure
+* Risk distribution on processed data
+
+---
+
+## Buildathon Track Alignment
+
+PayShield AI is primarily aligned with the **AI Revenue Recovery** track.
+
+The project follows the concept:
+
+```text
+Payment degradation
+       ↓
+Risk detection
+       ↓
+Root-cause diagnosis
+       ↓
+Recovery recommendation
+```
+
+The system focuses on identifying payment revenue at risk and recommending an appropriate intervention rather than simply predicting whether a transaction will fail.
+
+The current prototype demonstrates the intelligence and decision layer required for this workflow using simulated payment-system conditions.
+
+---
+
+## Why This Approach
+
+Traditional payment retry logic can treat every failure similarly.
+
+PayShield AI instead asks:
+
+> **Why is this payment likely to fail?**
+
+and then:
+
+> **What should the payment system do about it?**
+
+This enables a more context-aware approach:
+
+```text
+Payment Risk
+     +
+System Health
+     +
+Root Cause
+     ↓
+Recovery Decision
+```
+
+The objective is not only to predict failures but to turn payment-risk signals into actionable recovery decisions.
+
+---
+
+## Current Results
+
+The current simulation contains:
+
+| Metric                 |        Result |
+| ---------------------- | ------------: |
+| Transactions monitored |       100,000 |
+| Payment success rate   |        97.19% |
+| Average latency        | ~1.25 seconds |
+| High-risk predictions  |           286 |
+
+### Current Optimization Prioritization
+
+| Priority         | Count |
+| ---------------- | ----: |
+| Critical Actions |    12 |
+| High Priority    |   274 |
+| Medium Priority  |     6 |
+| No Intervention  | 9,897 |
+
+These values are based on the current simulated/processed dataset and should not be interpreted as live payment-network statistics.
+
+---
+
+## Limitations
+
+PayShield AI is currently a prototype and simulation environment.
+
+It does **not** currently:
+
+* Connect to live UPI infrastructure
+* Connect to real bank accounts
+* Intercept real payment authorization requests
+* Execute real payment retries
+* Automatically reroute real payment traffic
+* Access live bank health APIs
+* Access real merchant transaction data
+* Guarantee payment success
+* Automatically recover real revenue
+
+The bank and gateway degradation scenarios are simulated to demonstrate the decision-making architecture.
+
+The optimization engine currently provides recommendations rather than executing real payment-routing actions.
+
+---
+
+## Future Scope
+
+Potential production extensions include:
+
+### Real-Time Payment Monitoring
+
+Integrate streaming transaction events and live payment-system telemetry.
+
+### Real Bank and Gateway Health Signals
+
+Connect to authorized operational health and payment-processing APIs.
+
+### Explainable AI
+
+Integrate SHAP or similar methods to explain why a payment was classified as high risk.
+
+### Automated Recovery
+
+Execute bounded recovery workflows such as:
+
+```text
+Retry
+  ↓
+Alternate Payment Route
+  ↓
+Alternate Method
+  ↓
+Escalation
+```
+
+with configurable stopping rules.
+
+### Revenue Recovery Measurement
+
+Track:
+
+* Payments recovered
+* Revenue recovered
+* Recovery rate
+* Intervention success
+* Cost per intervention
+
+### Adaptive Routing
+
+Use historical intervention outcomes and controlled experiments to learn which routing action works best under different failure conditions.
+
+### A/B Testing
+
+Compare recovery strategies using controlled experiments.
+
+### Online Learning
+
+Continuously update risk predictions as payment behaviour changes.
+
+### Alerts
+
+Trigger operational alerts when:
+
+* Failure rates increase
+* Latency spikes
+* Bank health deteriorates
+* Gateway health deteriorates
+* High-risk payment volume increases
+
+---
+
+## Technical Stack
+
+```text
+Python
+Pandas
+NumPy
+Scikit-learn
+Joblib
+Streamlit
+Plotly
+Jupyter Notebook
+Git / GitHub
 ```
 
 ---
 
-## 18. AI-Assisted Optimization
+## Project Philosophy
 
-The optimization engine uses the AI-generated risk level together with operational payment indicators to recommend appropriate actions.
+PayShield AI is built around a simple principle:
 
-For example:
+> **Don't just predict payment failure. Understand why it is happening and recommend what should happen next.**
 
-- High AI risk combined with high failure rate can trigger a recommendation to route traffic away.
-- High AI risk combined with timeout or latency pressure can trigger a recommendation to prefer an alternate healthy route.
-- Medium risk can trigger closer monitoring.
-- Elevated risk with high latency can trigger reduced traffic exposure.
-- Low-risk conditions require no intervention.
-
-The optimization engine is therefore a decision-support layer built on top of the machine-learning risk engine.
+The long-term objective is to evolve the prototype from a payment-risk prediction system into an intelligent payment-recovery decision layer capable of detecting degradation, diagnosing root causes, selecting bounded interventions, and measuring recovered revenue.
 
 ---
 
-## 19. Important AI Limitation
+## Disclaimer
 
-The optimization engine is an **AI-assisted recommendation layer**, not a learned causal optimization policy.
+PayShield AI is an experimental software prototype developed for demonstration and buildathon purposes.
 
-The current dataset does not contain sufficient historical intervention outcomes or counterfactual routing experiments to claim that the system has learned the globally optimal payment-routing decision.
+All payment, bank-health, gateway-health, transaction, and failure scenarios used in the current implementation are simulated or derived from project-generated datasets.
 
-The current system should therefore be described as:
-
-> **Machine-learning-based payment risk prediction with AI-assisted optimization recommendations.**
-
-Future versions can incorporate historical intervention data such as:
-
-- Historical routing decisions
-- Gateway selection
-- Intervention outcomes
-- Payment success after intervention
-- Transaction cost
-- Latency impact
-- A/B testing results
-
-These additional data could support a learned optimization or decision-policy model.
-
----
-
-## 20. Future Scope
-
-Potential future improvements include:
-
-1. Real-time payment-stream ingestion.
-2. Automated bank/gateway routing.
-3. Model explainability using SHAP.
-4. Online model monitoring.
-5. Automated alerting.
-6. Merchant-level optimization.
-7. Adaptive retry optimization.
-8. Reinforcement-learning-based routing.
-9. A/B testing of optimization recommendations.
-10. Cloud deployment and API integration.
-
----
-
-## 21. Validation Summary
-
-The current prototype has been validated across its core dashboard workflows.
-
-### Pre-Payment Risk Validation
-
-- Healthy baseline: 0.00% LOW risk
-- Degraded simulation: 84.50% HIGH risk
-- HIGH-risk recommendation: Route traffic away
-- No feature-schema errors during stress simulation
-
-### Dashboard Validation
-
-- Bank health monitoring verified
-- Dual-axis latency/failure visualization verified
-- Four-tier risk distribution verified across the available prediction records
-- 286 HIGH-risk records correctly surfaced and prioritized
-- Risk-driver diagnostics verified
-- AI optimization recommendations verified:
-     - 12 Critical actions
-     - 274 High-priority actions
-     - 6 Medium-priority actions
-     - 9,897 No Intervention cases
-
-### Current Dashboard Metrics
-- Transactions monitored: 100,000
-- Payment success rate: 97.19%
-- Average latency: 1,247 ms
-- HIGH risk (≥80%): 286 (2.8% of predictions)
-- MEDIUM risk (50–80%): 0 (0.0% of predictions)
-- ELEVATED risk (20–50%): 11 (0.1% of predictions)
-- LOW risk (<20%): 9,892 (97.1% of predictions)
-- Average model risk probability: 6.47%
-- Peak model risk probability: 13.60%
-- Latest monitored failure rate: 0.00%
-- Latest monitored average latency: 1,589 ms
-
-The degraded-bank scenario is a controlled simulation used to demonstrate how the risk engine responds to degraded payment-system conditions. It does not represent live bank, UPI, or payment-gateway telemetry.
-
----
+The system should not be used to make real financial, banking, payment authorization, fraud, or routing decisions without appropriate validation, security controls, compliance review, and integration with authorized production systems.
