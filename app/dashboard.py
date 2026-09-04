@@ -185,7 +185,7 @@ def inspect_route_telemetry(sender, receiver, amount, simulated_fault="AUTOMATIC
         vector["rolling_latency"] = rec_lat
 
     fault_domain = "NONE"
-    fault_label = "None. All downstream banking endpoints and gateways are operating normally."
+    fault_label = "None. All downstream banking endpoints and networks are operating normally."
     sender_health = "NORMAL"
     receiver_health = "NORMAL"
     gateway_health = "NORMAL"
@@ -193,7 +193,7 @@ def inspect_route_telemetry(sender, receiver, amount, simulated_fault="AUTOMATIC
     if simulated_fault == "Sender CBS Outage (Issuer Stress)":
         fault_domain = "SENDER"
         sender_health = "SEVERE"
-        fault_label = f"Core Banking System (CBS) degradation detected at {sender}"
+        fault_label = f"Core Banking System (CBS) outage detected at {sender}"
         vector.update({
             "failure_rate": 45.0,
             "bank_error_rate": 0.35,
@@ -205,7 +205,7 @@ def inspect_route_telemetry(sender, receiver, amount, simulated_fault="AUTOMATIC
     elif simulated_fault == "Receiver Network Congestion (Acquirer Stress)":
         fault_domain = "RECEIVER"
         receiver_health = "SEVERE"
-        fault_label = f"Downstream settlement congestion detected at {receiver}"
+        fault_label = f"Downstream bank server outage detected at {receiver}"
         vector.update({
             "failure_rate": 48.0,
             "bank_error_rate": 0.40,
@@ -217,7 +217,7 @@ def inspect_route_telemetry(sender, receiver, amount, simulated_fault="AUTOMATIC
     elif simulated_fault == "Payment Gateway Spike (Rail Degradation)":
         fault_domain = "GATEWAY"
         gateway_health = "SEVERE"
-        fault_label = "Payment gateway timeout spike & latency surge detected"
+        fault_label = "Payment network timeout spike & routing latency surge detected"
         vector.update({
             "avg_latency": 4200.0,
             "max_latency": 6000.0,
@@ -230,9 +230,33 @@ def inspect_route_telemetry(sender, receiver, amount, simulated_fault="AUTOMATIC
         if vector["failure_rate"] >= 15.0 or vector["avg_latency"] >= 3000.0:
             fault_domain = "RECEIVER"
             receiver_health = "SEVERE"
-            fault_label = f"Elevated settlement failure detected at {receiver}"
+            fault_label = f"Elevated failure rates detected at {receiver}"
 
     return vector, fault_domain, fault_label, sender_health, receiver_health, gateway_health
+
+
+# ============================================================
+# STATE TRANSITION CALLBACKS
+# ============================================================
+
+def switch_sender_bank(target_bank):
+    st.session_state["prod_sender"] = target_bank
+    st.session_state["judge_stress_selector"] = "Automatic (Inspect Active Historical Telemetry)"
+    st.session_state["show_sender_switcher"] = False
+    st.session_state["force_override"] = False
+    st.session_state["rerouted_recovered"] = True
+
+
+def switch_receiver_account(target_label):
+    st.session_state["prod_receiver_account"] = target_label
+    st.session_state["judge_stress_selector"] = "Automatic (Inspect Active Historical Telemetry)"
+    st.session_state["show_receiver_switcher"] = False
+    st.session_state["force_override"] = False
+    st.session_state["rerouted_recovered"] = True
+
+
+def allow_continue_anyway():
+    st.session_state["force_override"] = True
 
 
 # ============================================================
@@ -241,18 +265,24 @@ def inspect_route_telemetry(sender, receiver, amount, simulated_fault="AUTOMATIC
 
 st.title("🛡️ PayShield AI")
 st.subheader("Autonomous Pre-Authorization Payment Protection")
-st.caption("🛡️ Production-Intent Prototype • Evaluated on Real-Time Telemetry Simulation")
+st.caption("🛡️ Universal Payment Resilience • Evaluated on Real-Time Telemetry Simulation")
 st.write(
     "PayShield AI intercepts payment requests before authorization, autonomously inspecting "
-    "tri-party banking telemetry (Sender CBS, Receiver Switch, and Gateway Rails) to prevent silent transaction failures."
+    "tri-party banking telemetry (Sender Bank, Recipient Bank, and Network Rails) to prevent transaction failures."
 )
 
 st.divider()
 
 
 # ============================================================
-# 2. MAIN SCREEN: CUSTOMER CHECKOUT INTERFACE
+# 2. MAIN SCREEN: UNIVERSAL CHECKOUT INTERFACE
 # ============================================================
+
+all_banks = sorted(
+    transactions["receiver_bank"].dropna().astype(str).unique().tolist()
+    if "receiver_bank" in transactions.columns
+    else ["AXIS", "BOB", "CANARA", "HDFC", "ICICI", "IDFC", "INDUSIND", "KOTAK", "PNB", "SBI"]
+)
 
 available_sender_banks = sorted(
     transactions["sender_bank"].dropna().astype(str).unique().tolist()
@@ -260,18 +290,39 @@ available_sender_banks = sorted(
     else ["SBI", "HDFC", "ICICI", "AXIS", "CANARA"]
 )
 
-available_receiver_banks = sorted(
-    transactions["receiver_bank"].dropna().astype(str).unique().tolist()
-    if "receiver_bank" in transactions.columns
-    else ["CANARA", "HDFC", "SBI", "ICICI", "AXIS"]
-)
+def pick_backup(b_curr):
+    fallbacks = [b for b in ["HDFC", "ICICI", "SBI", "BOB", "AXIS"] if b != b_curr]
+    return fallbacks[0] if fallbacks else "HDFC"
 
-# Initialize Session State defaults for one-click recovery
+RECIPIENT_PROFILES = {
+    f"Primary Account ({b})": {
+        "bank": b,
+        "backup_label": f"Pre-Approved Backup Account ({pick_backup(b)})",
+        "backup_bank": pick_backup(b)
+    }
+    for b in all_banks
+}
+
 if "prod_sender" not in st.session_state:
     st.session_state["prod_sender"] = available_sender_banks[0]
 
+if "prod_receiver_account" not in st.session_state:
+    st.session_state["prod_receiver_account"] = list(RECIPIENT_PROFILES.keys())[0]
+
 if "rerouted_recovered" not in st.session_state:
     st.session_state["rerouted_recovered"] = False
+
+if "force_override" not in st.session_state:
+    st.session_state["force_override"] = False
+
+if "show_sender_switcher" not in st.session_state:
+    st.session_state["show_sender_switcher"] = False
+
+if "show_receiver_switcher" not in st.session_state:
+    st.session_state["show_receiver_switcher"] = False
+
+has_multiple_sender_accounts = st.session_state.get("user_has_multiple_accounts", True)
+has_receiver_backup_consent = st.session_state.get("receiver_has_backup_consent", True)
 
 c1, c2, c3 = st.columns(3)
 
@@ -286,22 +337,22 @@ with c1:
 
 with c2:
     sender_bank = st.selectbox(
-        "Sender Bank (From)",
+        "Pay From (Your Linked Bank)",
         available_sender_banks,
         key="prod_sender"
     )
 
 with c3:
-    receiver_bank = st.selectbox(
-        "Receiver Bank (To)",
-        available_receiver_banks,
-        index=min(1, len(available_receiver_banks) - 1),
-        key="prod_receiver"
+    current_receiver_label = st.selectbox(
+        "Pay To (Recipient Bank / Account)",
+        list(RECIPIENT_PROFILES.keys()),
+        key="prod_receiver_account"
     )
+    active_receiver_info = RECIPIENT_PROFILES[current_receiver_label]
+    receiver_bank = active_receiver_info["bank"]
 
 check_btn = st.button("⚡ Verify Route Safety", type="primary", use_container_width=True)
 
-# Read active simulation override directly from judge controls
 active_sim_condition = st.session_state.get("judge_stress_selector", "Automatic (Inspect Active Historical Telemetry)")
 
 condition_map = {
@@ -312,7 +363,6 @@ condition_map = {
 }
 sim_fault = condition_map.get(active_sim_condition, "AUTOMATIC")
 
-# Benchmark inference latency
 t0 = time.perf_counter()
 
 # Execute Autonomous Telemetry Inspection
@@ -325,7 +375,6 @@ pred_result = risk_engine.predict(input_df)[0]
 raw_prob = float(pred_result["risk_probability"]) * 100.0
 risk_tier = str(pred_result["risk_level"]).upper()
 
-# Calibration logic per diagnosed domain
 if fault_domain == "SENDER":
     risk_probability = max(raw_prob, 91.40)
     risk_tier = "HIGH"
@@ -350,49 +399,127 @@ inference_ms = (time.perf_counter() - t0) * 1000.0
 
 
 # ============================================================
-# 3. LARGE PRODUCT RESULT CARD (DECISION INTERCEPTOR)
+# 3. DECISION INTERCEPTOR CARD (UNIVERSAL & VOLUNTARY)
 # ============================================================
 
 st.write("")
 
-# Identify primary alternate linked account
-alternate_bank = "HDFC" if sender_bank != "HDFC" else "SBI"
-
 if st.session_state.get("rerouted_recovered", False) and risk_tier == "LOW":
-    st.info(f"✨ **Smart Routing Active:** Switched to {sender_bank} • Downstream route clear.")
+    st.info(f"✨ **Smart Routing Active:** Route secured via healthy endpoint (From: {sender_bank} • To: {receiver_bank}) • Telemetry clear.")
 
 if risk_tier == "HIGH":
-    st.error(f"### 🔴 High Failure Risk Detected: {risk_probability:.1f}%")
+    st.error(f"### 🔴 High Payment Failure Risk: {risk_probability:.1f}%")
     res_col1, res_col2 = st.columns([2, 1])
     with res_col1:
         st.markdown(f"**Problem Detected:** {fault_label}")
-        st.markdown(f"**Recommended Action:** {rec_action}")
+        st.markdown(f"**Advisory Recommendation:** {rec_action}")
         st.caption(f"⚡ Pre-Auth Intercept: **{inference_ms:.2f} ms** (Zero UI latency)")
     with res_col2:
         st.metric("Payment Network Health", "CRITICAL RISK", delta="- Degraded", delta_color="inverse")
 
     st.write("")
     b_col1, b_col2 = st.columns(2)
+    
     with b_col1:
         if fault_domain == "SENDER":
-            if st.button(f"🔄 Switch to Linked {alternate_bank} Account", type="primary", use_container_width=True):
-                st.session_state["prod_sender"] = alternate_bank
-                st.session_state["judge_stress_selector"] = "Automatic (Inspect Active Historical Telemetry)"
-                st.session_state["rerouted_recovered"] = True
-                st.rerun()
+            if has_multiple_sender_accounts:
+                if st.button("🔄 Pay via Alternate Linked Account", type="primary", use_container_width=True):
+                    st.session_state["show_sender_switcher"] = not st.session_state.get("show_sender_switcher", False)
+                    st.rerun()
+            else:
+                st.button("🔔 Notify Me When Server Recovers", type="primary", use_container_width=True)
+
         elif fault_domain == "RECEIVER":
-            st.button("🔄 Try Alternate VPA / Account", type="primary", use_container_width=True)
+            if has_receiver_backup_consent:
+                if st.button("⚡ Pay via Backup Account", type="primary", use_container_width=True):
+                    st.session_state["show_receiver_switcher"] = not st.session_state.get("show_receiver_switcher", False)
+                    st.rerun()
+            else:
+                st.button("⏰ Schedule Auto-Pay When Rail Clears", type="primary", use_container_width=True)
+
         else:
-            st.button("🔀 Route via Alternate Gateway", type="primary", use_container_width=True)
+            st.button("🔀 Route via Alternate Network Rail", type="primary", use_container_width=True)
+
     with b_col2:
-        st.button("Continue Anyway (Not Recommended)", use_container_width=True)
+        st.button(
+            "Continue Anyway (High Failure Risk)",
+            use_container_width=True,
+            on_click=allow_continue_anyway
+        )
+
+    # Drawer 1: Sender Multi-Account Switcher
+    if st.session_state.get("show_sender_switcher", False) and fault_domain == "SENDER" and has_multiple_sender_accounts:
+        st.markdown("---")
+        st.markdown("#### 💳 Select Alternate Account to Complete Payment:")
+        sender_alternates = [b for b in available_sender_banks if b != sender_bank]
+
+        cols = st.columns(min(len(sender_alternates), 4))
+        for idx, acc in enumerate(sender_alternates):
+            with cols[idx % 4]:
+                st.caption(f"**{acc} Bank** • 🟢 Operational")
+                st.button(
+                    f"Pay with {acc}",
+                    key=f"btn_choose_sender_{acc}",
+                    use_container_width=True,
+                    on_click=switch_sender_bank,
+                    args=(acc,)
+                )
+
+    # Drawer 2: Receiver Verified Backup Account Confirmation
+    if st.session_state.get("show_receiver_switcher", False) and fault_domain == "RECEIVER" and has_receiver_backup_consent:
+        st.markdown("---")
+        backup_bank_clean = active_receiver_info["backup_bank"]
+
+        st.success(
+            f"""
+            #### 🛡️ Verified Backup Route Available
+            * **Primary Rail:** {receiver_bank} is experiencing server issues.
+            * **Backup Rail:** {backup_bank_clean} is online and operational.
+            
+            *The recipient pre-linked this account so payments can clear without getting stuck.*
+            """
+        )
+
+        matched_key = None
+        for k in RECIPIENT_PROFILES.keys():
+            if f"({backup_bank_clean})" in k:
+                matched_key = k
+                break
+        if not matched_key:
+            matched_key = list(RECIPIENT_PROFILES.keys())[1]
+
+        st.button(
+            f"✅ Confirm Payment via {backup_bank_clean}",
+            key="btn_confirm_fallback",
+            type="primary",
+            use_container_width=True,
+            on_click=switch_receiver_account,
+            args=(matched_key,)
+        )
+
+    # Single-Account Edge Case Advisories
+    if not has_multiple_sender_accounts and fault_domain == "SENDER":
+        st.info("ℹ️ **Single Account Linked:** You have no alternate bank account linked on this profile. Entering your PIN now risks debiting funds into a 3–5 day refund turnaround.")
+
+    if not has_receiver_backup_consent and fault_domain == "RECEIVER":
+        st.warning(f"⚠️ **Single Destination Account:** Recipient has not registered a backup account. Money will leave your account but freeze at {receiver_bank}'s switch.")
+
+    # User Override Flow: If user explicitly clicks "Continue Anyway"
+    if st.session_state.get("force_override", False):
+        st.markdown("---")
+        st.warning("⚠️ **User Override Active:** Downstream network instability acknowledged. You may now enter your PIN.")
+        st.button(
+            f"⚠️ Proceed to Authorize ₹{payment_amount:,.2f} at Own Risk",
+            key="override_pin_submit",
+            use_container_width=True
+        )
 
 elif risk_tier in ["ELEVATED", "MEDIUM"]:
     st.warning(f"### 🟠 Elevated Payment Risk: {risk_probability:.1f}%")
     res_col1, res_col2 = st.columns([2, 1])
     with res_col1:
         st.markdown(f"**Problem Detected:** {fault_label}")
-        st.markdown(f"**Recommended Action:** {rec_action}")
+        st.markdown(f"**Advisory Recommendation:** {rec_action}")
         st.caption(f"⚡ Pre-Auth Intercept: **{inference_ms:.2f} ms**")
     with res_col2:
         st.metric("Payment Network Health", "STRESSED", delta="- Caution", delta_color="inverse")
@@ -403,8 +530,8 @@ else:
     st.success(f"### 🟢 Payment Route Healthy: {risk_probability:.2f}% Risk")
     res_col1, res_col2 = st.columns([2, 1])
     with res_col1:
-        st.markdown("**Problem Detected:** None. All downstream banking endpoints and gateways are operating normally.")
-        st.markdown(f"**Recommended Action:** {rec_action}")
+        st.markdown(f"**Problem Detected:** None. Downstream banking rail for {receiver_bank} is operating normally.")
+        st.markdown(f"**Advisory Recommendation:** {rec_action}")
         st.caption(f"⚡ Pre-Auth Intercept: **{inference_ms:.2f} ms** (Autonomous verification clear)")
     with res_col2:
         st.metric("Payment Network Health", "OPTIMAL", delta="Healthy", delta_color="normal")
@@ -421,7 +548,7 @@ else:
 # ============================================================
 
 with st.expander("🔬 AI System Details & Live Evaluation Controls", expanded=False):
-    st.caption("Diagnostic view for evaluators: inspect model inference, feature payload, and inject telemetry stress tests.")
+    st.caption("Diagnostic view for evaluators: inspect model inference, test user/receiver consent profiles, and inject stress tests.")
 
     st.markdown("#### 🛠️ Telemetry Network Stress Injection (Judge Testing)")
     st.radio(
@@ -436,6 +563,28 @@ with st.expander("🔬 AI System Details & Live Evaluation Controls", expanded=F
         key="judge_stress_selector",
         on_change=st.rerun
     )
+
+    st.markdown("---")
+    st.markdown("#### 👤 Edge Case Simulation Controls")
+    ctl1, ctl2 = st.columns(2)
+    
+    with ctl1:
+        sender_mode = st.radio(
+            "Sender User Profile:",
+            ["Multi-Account (Has Alternate Banks)", "Single-Account (Only 1 Bank Linked)"],
+            index=0 if has_multiple_sender_accounts else 1,
+            key="sender_profile_toggle"
+        )
+        st.session_state["user_has_multiple_accounts"] = (sender_mode == "Multi-Account (Has Alternate Banks)")
+
+    with ctl2:
+        receiver_mode = st.radio(
+            "Receiver Pre-Authorized Consent:",
+            ["Has Registered Backup Account", "Single Account Only (No Backup Consent)"],
+            index=0 if has_receiver_backup_consent else 1,
+            key="receiver_profile_toggle"
+        )
+        st.session_state["receiver_has_backup_consent"] = (receiver_mode == "Has Registered Backup Account")
 
     st.markdown("---")
     st.markdown("#### 📊 Model Inference Telemetry")
@@ -473,7 +622,6 @@ with st.expander("📊 System Analytics & Operational Health Dashboard", expande
     m3.metric("Transactions Monitored", f"{total_tx:,}")
     m4.metric("High-Risk Predictions", f"{high_risk_count:,}")
 
-    # Bank Monitoring Section
     st.markdown("---")
     st.markdown("### Bank Health Monitoring")
     if "receiver_bank" in monitoring.columns:
@@ -494,7 +642,6 @@ with st.expander("📊 System Analytics & Operational Health Dashboard", expande
             bm3.metric("Timeout Rate", f"{t_rate:.2f}%")
             bm4.metric("Average Latency", f"{lat:.0f} ms")
 
-    # Risk Distribution
     st.markdown("---")
     st.markdown("### Risk Tier Distribution")
     risk_levels = risk_predictions["risk_level"].astype(str).str.upper()
@@ -518,7 +665,6 @@ with st.expander("📊 System Analytics & Operational Health Dashboard", expande
     fig_risk.update_layout(height=350, margin=dict(t=20, b=20, l=20, r=20))
     st.plotly_chart(fig_risk, use_container_width=True)
 
-    # Optimization Recommendations
     st.markdown("---")
     st.markdown("### AI Optimization Queue")
     if isinstance(recommendations, pd.DataFrame) and not recommendations.empty:
