@@ -2,6 +2,10 @@
 
 ### Machine-Learning-Based Payment Risk Prediction and AI-Assisted Revenue Recovery
 
+🚀 **Live Demo:** https://abhilasha-git-payshield-ai-appdashboard-ffxsjf.streamlit.app/
+
+📦 **GitHub Repository:** https://github.com/Abhilasha-git/PayShield-AI
+
 PayShield AI is an intelligent payment monitoring and decision-support system designed to identify payment failure risk before authorization and recommend actions that can improve payment success.
 
 The system combines machine-learning-based risk prediction with payment-system health signals from sender banks, receiver banks, and payment gateways. It diagnoses the likely source of payment degradation and produces an AI-assisted recovery recommendation such as monitoring, retrying through an alternate route, or routing traffic away from an unhealthy payment environment.
@@ -28,11 +32,11 @@ PayShield AI addresses this problem through a four-stage intelligence workflow:
 
 ```text
 DETECT
-   ↓
+   â†“
 DIAGNOSE
-   ↓
+   â†“
 DECIDE
-   ↓
+   â†“
 RECOVER
 ```
 
@@ -97,33 +101,33 @@ Displays:
 
 ```text
                     Payment Attempt
-                          │
-                          ▼
+                          â”‚
+                          â–¼
               Collect Payment Signals
-                          │
-          ┌───────────────┼───────────────┐
-          ▼               ▼               ▼
+                          â”‚
+          â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+          â–¼               â–¼               â–¼
      Sender Bank     Receiver Bank    Gateway Health
         Health           Health
-          │               │               │
-          └───────────────┼───────────────┘
-                          ▼
+          â”‚               â”‚               â”‚
+          â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                          â–¼
                  Root-Cause Diagnosis
-                          │
-                          ▼
+                          â”‚
+                          â–¼
                   ML Risk Prediction
-                          │
-                          ▼
+                          â”‚
+                          â–¼
                   Risk Classification
-                          │
-                          ▼
+                          â”‚
+                          â–¼
                    Recovery Decision
-                          │
-          ┌───────────────┼───────────────┐
-          ▼               ▼               ▼
+                          â”‚
+          â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+          â–¼               â–¼               â–¼
         Retry       Alternate Route     Monitor
-                          │
-                          ▼
+                          â”‚
+                          â–¼
                     Measure / Improve
 ```
 
@@ -167,9 +171,9 @@ Risk levels are classified as:
 | Risk Probability | Risk Level |
 | ---------------: | ---------- |
 |            < 20% | LOW        |
-|      20% – < 50% | ELEVATED   |
-|      50% – < 80% | MEDIUM     |
-|            ≥ 80% | HIGH       |
+|      20% â€“ < 50% | ELEVATED   |
+|      50% â€“ < 80% | MEDIUM     |
+|            â‰¥ 80% | HIGH       |
 
 The current decision threshold for binary risky/non-risky classification is **50%**.
 
@@ -399,8 +403,8 @@ Sender Health
 Receiver Health
        +
 Gateway Health
-       │
-       ▼
+       â”‚
+       â–¼
 Recovery Recommendation
 ```
 
@@ -424,53 +428,53 @@ A production-grade optimization policy would require historical intervention out
 
 ```text
 PayShield AI/
-│
-├── app/
-│   └── dashboard.py
-│
-├── data/
-│   ├── raw/
-│   │   └── transactions.csv
-│   │
-│   └── processed/
-│       ├── payment_monitoring_enhanced.csv
-│       └── payShield_predictions.csv
-│
-├── models/
-│   └── payshield_risk_model.joblib
-│
-├── notebooks/
-│   ├── 01_data_generation.ipynb
-│   ├── 02_eda.ipynb
-│   ├── 03_feature_engineering.ipynb
-│   ├── 04_ml_dataset.ipynb
-│   ├── 05_model_training.ipynb
-│   ├── 06_model_comparison.ipynb
-│   ├── 07_threshold_optimization.ipynb
-│   ├── 08_explainability.ipynb
-│   └── 09_realyime_prediction.ipynb
-│
-├── optimization_engine/
-│   ├── __init__.py
-│   └── recommendation_engine.py
-│
-├── risk_engine/
-│   ├── __init__.py
-│   ├── engine.py
-│   ├── evaluate.py
-│   ├── predict.py
-│   ├── threshold_analysis.py
-│   ├── train.py
-│   ├── test_engine.py
-│   ├── test_predict.py
-│   └── test_real_data.py
-│
-├── src/
-│   └── data_generation.py
-│
-├── .gitignore
-├── README.md
-└── requirements.txt
+â”‚
+â”œâ”€â”€ app/
+â”‚   â””â”€â”€ dashboard.py
+â”‚
+â”œâ”€â”€ data/
+â”‚   â”œâ”€â”€ raw/
+â”‚   â”‚   â””â”€â”€ transactions.csv
+â”‚   â”‚
+â”‚   â””â”€â”€ processed/
+â”‚       â”œâ”€â”€ payment_monitoring_enhanced.csv
+â”‚       â””â”€â”€ payShield_predictions.csv
+â”‚
+â”œâ”€â”€ models/
+â”‚   â””â”€â”€ payshield_risk_model.joblib
+â”‚
+â”œâ”€â”€ notebooks/
+â”‚   â”œâ”€â”€ 01_data_generation.ipynb
+â”‚   â”œâ”€â”€ 02_eda.ipynb
+â”‚   â”œâ”€â”€ 03_feature_engineering.ipynb
+â”‚   â”œâ”€â”€ 04_ml_dataset.ipynb
+â”‚   â”œâ”€â”€ 05_model_training.ipynb
+â”‚   â”œâ”€â”€ 06_model_comparison.ipynb
+â”‚   â”œâ”€â”€ 07_threshold_optimization.ipynb
+â”‚   â”œâ”€â”€ 08_explainability.ipynb
+â”‚   â””â”€â”€ 09_realyime_prediction.ipynb
+â”‚
+â”œâ”€â”€ optimization_engine/
+â”‚   â”œâ”€â”€ __init__.py
+â”‚   â””â”€â”€ recommendation_engine.py
+â”‚
+â”œâ”€â”€ risk_engine/
+â”‚   â”œâ”€â”€ __init__.py
+â”‚   â”œâ”€â”€ engine.py
+â”‚   â”œâ”€â”€ evaluate.py
+â”‚   â”œâ”€â”€ predict.py
+â”‚   â”œâ”€â”€ threshold_analysis.py
+â”‚   â”œâ”€â”€ train.py
+â”‚   â”œâ”€â”€ test_engine.py
+â”‚   â”œâ”€â”€ test_predict.py
+â”‚   â””â”€â”€ test_real_data.py
+â”‚
+â”œâ”€â”€ src/
+â”‚   â””â”€â”€ data_generation.py
+â”‚
+â”œâ”€â”€ .gitignore
+â”œâ”€â”€ README.md
+â””â”€â”€ requirements.txt
 ```
 
 ---
@@ -580,11 +584,11 @@ The project follows the concept:
 
 ```text
 Payment degradation
-       ↓
+       â†“
 Risk detection
-       ↓
+       â†“
 Root-cause diagnosis
-       ↓
+       â†“
 Recovery recommendation
 ```
 
@@ -614,7 +618,7 @@ Payment Risk
 System Health
      +
 Root Cause
-     ↓
+     â†“
 Recovery Decision
 ```
 
@@ -690,11 +694,11 @@ Execute bounded recovery workflows such as:
 
 ```text
 Retry
-  ↓
+  â†“
 Alternate Payment Route
-  ↓
+  â†“
 Alternate Method
-  ↓
+  â†“
 Escalation
 ```
 
