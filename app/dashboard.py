@@ -29,7 +29,7 @@ st.set_page_config(
 
 st.title("🛡️ PayShield AI")
 st.subheader("AI-Powered Payment Success Optimization")
-st.write("Real-time monitoring and risk prediction for payment-system health.")
+st.write("Payment-system monitoring and risk prediction.")
 
 # ============================================================
 # FILE PATHS
@@ -697,18 +697,18 @@ with action_col1:
 
 with action_col2:
     st.markdown("""
-    **Automated Mitigation Steps**
+    **AI-Assisted Mitigation Recommendations**
     * 🔄 **Smart Rerouting:** Temporarily reroute subsequent transactions away from high-latency receiver bank endpoints.
     * ⏱️ **Adaptive Timeout Adjustments:** Extend transaction verification windows by 500 ms during detected latency surges.
     * 🔔 **Webhook Alerts:** Trigger automated webhooks to merchant integration systems for transactions flagged as `HIGH`.
     """)
 
 # ============================================================
-# AI PAYMENT SUCCESS OPTIMIZATION
+# AI-Assisted PAYMENT SUCCESS OPTIMIZATION
 # ============================================================
 
 st.divider()
-st.header("🤖 AI Payment Success Optimization")
+st.header("🤖 AI-Assisted Payment Success Optimization")
 
 st.caption(
     "AI-assisted recommendations generated from PayShield risk predictions "
@@ -949,7 +949,7 @@ if latest_failure_rate >= 5:
 elif latest_failure_rate >= 2:
     st.warning(f"⚠️ Payment system showing elevated failures. Failure rate: {latest_failure_rate:.2f}%")
 else:
-    st.success(f"✅ Payment system operating normally. Failure rate: {latest_failure_rate:.2f}%")
+    st.success(f"✅ Latest monitored condition is within normal range. Failure rate: {latest_failure_rate:.2f}%")
 
 st.write(f"Latest average latency: **{latest_latency:.0f} ms**")
 
