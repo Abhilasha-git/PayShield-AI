@@ -698,9 +698,9 @@ with action_col1:
 with action_col2:
     st.markdown("""
     **AI-Assisted Mitigation Recommendations**
-    * 🔄 **Smart Rerouting: Recommend temporarily rerouting subsequent transactions away from high-latency receiver bank endpoints.
-    * ⏱️ **Adaptive Timeout Adjustments: Recommend extending transaction verification windows by 500 ms during detected latency surges.
-    * 🔔 **Webhook Alerts: Recommend triggering webhook notifications to merchant integration systems for transactions flagged as HIGH.
+    * 🔄 **Smart Rerouting:** Recommend temporarily rerouting subsequent transactions away from high-latency receiver bank endpoints.
+    * ⏱️ **Adaptive Timeout Adjustments:** Recommend extending transaction verification windows by 500 ms during detected latency surges.
+    * 🔔 **Webhook Alerts:** Recommend triggering webhook notifications to merchant integration systems for transactions flagged as `HIGH`.
     """)
 
 # ============================================================
