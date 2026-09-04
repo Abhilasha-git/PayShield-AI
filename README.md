@@ -218,14 +218,14 @@ Recommendations are assigned priorities:
 
 The current dashboard applies the optimization engine to the AI-generated risk predictions.
 
-The validated dashboard output includes:
+The validated dashboard output across 100,000 monitored transactions includes:
 
-- 33 Critical actions
-- 23 High-priority actions
-- 8 Medium-priority actions
-- 10,125 Low-priority / no-intervention cases
+- 12 Critical actions
+- 274 High-priority actions
+- 6 Medium-priority actions
+- 9,897 Low-priority / no-intervention cases
 
-The 33 Critical and 23 High-priority recommendations correspond to the 56 HIGH-risk predictions, while the remaining recommendations are associated with MEDIUM, ELEVATED, or LOW-risk conditions.
+The 12 Critical and 274 High-priority recommendations correspond directly to the 286 HIGH-risk predictions, while the remaining recommendations are associated with ELEVATED or LOW-risk conditions.
 
 ---
 
@@ -536,11 +536,28 @@ The current prototype has been validated across its core dashboard workflows.
 
 - Bank health monitoring verified
 - Dual-axis latency/failure visualization verified
-- Four-tier risk distribution verified
-- 56 HIGH-risk records correctly surfaced
+- Four-tier risk distribution verified across the available prediction records
+- 286 HIGH-risk records correctly surfaced and prioritized
 - Risk-driver diagnostics verified
-- AI optimization recommendations verified
+- AI optimization recommendations verified:
+     - 12 Critical actions
+     - 274 High-priority actions
+     - 6 Medium-priority actions
+     - 9,897 No Intervention cases
 
-The degraded-bank scenario is a controlled simulation used to demonstrate model responsiveness and should not be interpreted as live bank or UPI telemetry.
+### Current Dashboard Metrics
+- Transactions monitored: 100,000
+- Payment success rate: 97.19%
+- Average latency: 1,247 ms
+- HIGH risk (≥80%): 286 (2.8% of predictions)
+- MEDIUM risk (50–80%): 0 (0.0% of predictions)
+- ELEVATED risk (20–50%): 11 (0.1% of predictions)
+- LOW risk (<20%): 9,892 (97.1% of predictions)
+- Average model risk probability: 6.47%
+- Peak model risk probability: 13.60%
+- Latest monitored failure rate: 0.00%
+- Latest monitored average latency: 1,589 ms
+
+The degraded-bank scenario is a controlled simulation used to demonstrate how the risk engine responds to degraded payment-system conditions. It does not represent live bank, UPI, or payment-gateway telemetry.
 
 ---
