@@ -352,10 +352,8 @@ The stress mode is a controlled simulation used to demonstrate how the risk engi
 
 ```text
 PayShield AI/
-│
 ├── app/
-│   ├── dashboard.py
-│   └── dashboard_backup.py
+│   └── dashboard.py
 │
 ├── data/
 │   ├── raw/
@@ -363,29 +361,43 @@ PayShield AI/
 │   │
 │   └── processed/
 │       ├── payment_monitoring_enhanced.csv
-│       ├── ml_dataset.csv
-│       ├── payShield_predictions.csv
-│       └── explainable_predictions.csv
+│       └── payShield_predictions.csv
 │
 ├── models/
 │   └── payshield_risk_model.joblib
 │
-├── risk_engine/
-│   ├── __init__.py
-│   ├── train.py
-│   ├── evaluate.py
-│   ├── threshold_analysis.py
-│   ├── engine.py
-│   ├── predict.py
-│   ├── test_engine.py
-│   ├── test_real_data.py
-│   └── test_predict.py
+├── notebooks/
+│   ├── 01_data_generation.ipynb
+│   ├── 02_eda.ipynb
+│   ├── 03_feature_engineering.ipynb
+│   ├── 04_ml_dataset.ipynb
+│   ├── 05_model_training.ipynb
+│   ├── 06_model_comparison.ipynb
+│   ├── 07_threshold_optimization.ipynb
+│   ├── 08_explainability.ipynb
+│   └── 09_realyime_prediction.ipynb
 │
 ├── optimization_engine/
 │   ├── __init__.py
 │   └── recommendation_engine.py
 │
-└── README.md
+├── risk_engine/
+│   ├── __init__.py
+│   ├── engine.py
+│   ├── evaluate.py
+│   ├── predict.py
+│   ├── test_engine.py
+│   ├── test_predict.py
+│   ├── test_real_data.py
+│   ├── threshold_analysis.py
+│   └── train.py
+│
+├── src/
+│   └── data_generation.py
+│
+├── .gitignore
+├── README.md
+└── requirements.txt
 ```
 
 ---
