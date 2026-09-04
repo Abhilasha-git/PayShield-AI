@@ -692,9 +692,9 @@ with action_col1:
     **Key Operational Findings**
     * **Latency Sensitivity:** High-risk predictions correlate strongly with gateway response latencies exceeding 300 ms.
     * **Bank Routing Clustering:** Peak risk transactions cluster around specific downstream receiver banks undergoing downtime.
-    * **Failure Isolation:** High-risk (≥80%) predictions represent a small share of total volume, enabling targeted traffic throttling.
+    * **Failure Isolation:** High-risk (≥80%) predictions represent a small share of total volume, supporting targeted traffic-throttling recommendations.
     """)
-
+    
 with action_col2:
     st.markdown("""
     **AI-Assisted Mitigation Recommendations**
