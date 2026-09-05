@@ -2,9 +2,12 @@
 
 ## AI-Powered Payment Risk Prediction & Success Optimization
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://abhilasha-git-payshield-ai-appdashboard-ffxsjf.streamlit.app/)
+[![Landing Page](https://img.shields.io/badge/Landing_Page-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://payshield-ai-kappa.vercel.app/)
+[![Streamlit App](https://img.shields.io/badge/Live_Demo-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://abhilasha-git-payshield-ai-appdashboard-ffxsjf.streamlit.app/)
+[![GitHub](https://img.shields.io/badge/Codebase-GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Abhilasha-git/PayShield-AI)
 
-[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/Abhilasha-git/PayShield-AI)
+
+> **Landing Page (Vercel):** https://payshield-ai-kappa.vercel.app/
 
 > **Live Demo:** https://abhilasha-git-payshield-ai-appdashboard-ffxsjf.streamlit.app/
 
@@ -369,21 +372,26 @@ The monitoring layer is based on the project's simulated/processed telemetry dat
 
 ---
 
-# 📊 Dashboard
+# 📊 Dashboard & Web Deployment
 
-PayShield AI provides an interactive dashboard for:
+PayShield AI provides an interactive operational dashboard along with a production landing page[cite: 5]:
 
-* Payment-system monitoring
-* Payment success analysis
-* AI risk prediction
-* Risk distribution
-* High-risk diagnostics
-* Bank health monitoring
-* Pre-payment risk simulation
-* AI-assisted optimization recommendations
-* Risk probability visualization
+* **Product Landing Page:** [https://payshield-ai-kappa.vercel.app/](https://payshield-ai-kappa.vercel.app/)
+* **Interactive AI Dashboard:** [https://abhilasha-git-payshield-ai-appdashboard-ffxsjf.streamlit.app/](https://abhilasha-git-payshield-ai-appdashboard-ffxsjf.streamlit.app/)[cite: 5]
 
-The dashboard is implemented using **Streamlit**.
+The dashboard enables real-time decision intelligence across several core capabilities[cite: 5]:
+
+* Payment-system monitoring[cite: 5]
+* Payment success analysis[cite: 5]
+* AI risk prediction[cite: 5]
+* Risk distribution[cite: 5]
+* High-risk diagnostics[cite: 5]
+* Bank health monitoring[cite: 5]
+* Pre-payment risk simulation[cite: 5]
+* AI-assisted optimization recommendations[cite: 5]
+* Risk probability visualization[cite: 5]
+
+The dashboard is implemented using **Streamlit** and hosted on **Streamlit Cloud**, while the product interface is deployed on **Vercel**[cite: 4, 5].
 
 ---
 
